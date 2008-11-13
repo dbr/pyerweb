@@ -75,7 +75,7 @@ def admin_post(action, postkey):
     return "Performing admin action %s with post %s" % (action, postkey)
 
 
-# Siple dispatcher that uses fixed URLs. Will obviously be replaced by
+# Simple dispatcher that uses fixed URLs. Will obviously be replaced by
 # a CGI script, or a simple web-server
 for request_url in ["/",
                     "/blog/view/hello",
