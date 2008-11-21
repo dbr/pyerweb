@@ -5,7 +5,7 @@ class Pyerweb_UrlMismatch(Exception):pass
 class Pyerweb_InternalServerError(Exception):pass
 class Pyerweb_PageNotFound(Exception):pass
 
-site_functions = []
+PYERWEB_SITE_FUNCTIONS = [] # Stores decorated functions
 
 class OutputHelpers:
     def html_tidy(self, html):
@@ -18,31 +18,35 @@ class OutputHelpers:
         tidy.stdin.write(html)
         # print tidy.stdout.read()
         return tidy.communicate()[0]
-        
+
+class magic_url(str):pass
+
 class GET:
     def __init__(self, orig_url):
         self.orig_url = orig_url
         self.matcher = re.compile(orig_url)
     
     def __call__(self, func):
-        def new_fun(url):
-            check_url = self.matcher.match(url)
-            if check_url:
-                parsed_args = check_url.groups()
+        def new_fun(*args, **kwargs):
+            if isinstance(args[0], magic_url):
+                # It's a Pyerweb dispatched call
+                check_url = self.matcher.match(args[0]) # request URL is first arg
+                if check_url:
+                    parsed_args = check_url.groups()
+                else:
+                    raise Pyerweb_UrlMismatch(
+                        "URL %s does not match %s" % (url, self.orig_url)
+                    )
+                return func(*parsed_args)
             else:
-                raise Pyerweb_UrlMismatch(
-                    "URL %s does not match %s" % (url, self.orig_url)
-                )
-            
-            return func(*parsed_args)
+                # It's a direct call to the function
+                return func(*args, **kwargs)
         
-        # Store in list of URL-mappable functions
-        site_functions.append(new_fun)
+        PYERWEB_SITE_FUNCTIONS.append(new_fun) # Add to list of URL-mappable functions
         return new_fun
 
 def router(url):
-    url_match = False
-    for cur in site_functions:
+    for cur in PYERWEB_SITE_FUNCTIONS:
         try:
             output_html = cur(url)
             if not (isinstance(output_html, unicode) or isinstance(output_html, str)):
@@ -58,17 +62,22 @@ def router(url):
             raise Pyerweb_InternalServerError(tb)
         
         else:
-            url_match = True
             return output_html
-    else:
-        if not url_match:
-            raise Pyerweb_PageNotFound
+    else: # We checked all site functions, none matched, raise error 404
+        raise Pyerweb_PageNotFound
 
 def runner(url, output_helper = None):
+    url = magic_url(url) # Wrap URL string into magic_url class
+    # If the call to @GET decorator __call__() is a magic_url then
+    # then the request came from here, if not it's a direct call!
+    
     try:
         output_html = router(url)
-    except Pyerweb_PageNotFound:
+    except Pyerweb_PageNotFound, errormsg:
         output_html = "<html><head><title>ERROR 404</title></head><body>The URL %s could not be found</body></html>" % (url)
+    except Pyerweb_InternalServerError, errormsg:
+        output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (errormsg)
+        
     
     if output_helper is not None:
         if output_helper not in dir(OutputHelpers()):
