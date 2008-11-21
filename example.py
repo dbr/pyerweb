@@ -52,10 +52,15 @@ class MySite:
 
 @GET("^/$")
 def index():
+    # Display the post archive by running the welcome() page
+    return welcome()
+
+@GET("^/archive$")
+def archive():
     site = MySite()
     
     return TEMPLATE % {
-        'title': "Welcome to Test Blog",
+        'title': "Post archive",
         'body': site.list_posts()
     }
 
@@ -74,12 +79,16 @@ def admin_post(action, postkey):
     site.delete_post(postkey)
     return "Performing admin action %s with post %s" % (action, postkey)
 
+@GET("^/makeanerror500$")
+def makeanerror500():
+    int('abc')
 
 # Simple dispatcher that uses fixed URLs. Will obviously be replaced by
 # a CGI script, or a simple web-server
 for request_url in ["/",
                     "/blog/view/hello",
                     "/admin/post/edit/hello",
-                    "/makeanerror404"]:
+                    "/makeanerror404",
+                    "/makeanerror500"]:
     print "*"*15, "Request for", request_url, "*"*15
     runner(request_url, output_helper = "html_tidy")
