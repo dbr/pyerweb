@@ -35,7 +35,7 @@ class GET:
                     parsed_args = check_url.groups()
                 else:
                     raise Pyerweb_UrlMismatch(
-                        "URL %s does not match %s" % (url, self.orig_url)
+                        "URL %s does not match %s" % (args[0], self.orig_url)
                     )
                 return func(*parsed_args)
             else:
