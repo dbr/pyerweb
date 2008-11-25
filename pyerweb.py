@@ -12,11 +12,9 @@ class OutputHelpers:
         import subprocess
         tidy = subprocess.Popen(["tidy", "-i", "-c", "-q", "--tidy-mark", "n"],
             stdin = subprocess.PIPE,
-            stdout = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
         tidy.stdin.write(html)
-        # print tidy.stdout.read()
         return tidy.communicate()[0]
 
 class magic_url(str):pass
