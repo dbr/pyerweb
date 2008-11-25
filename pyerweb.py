@@ -51,22 +51,15 @@ def router(url):
             output_html = cur(url)
             if not (isinstance(output_html, unicode) or isinstance(output_html, str)):
                 output_html = ""
-        
         except Pyerweb_UrlMismatch, errormsg:
-            # The regex doesn't match, skip it
-            pass
-        
-        except Exception, errormsg:
-            # An actual error occured, show it
-            tb = traceback.format_exc()
-            raise Pyerweb_InternalServerError(tb)
+            pass # The regex doesn't match, skip it
         
         else:
             return output_html
     else: # We checked all site functions, none matched, raise error 404
         raise Pyerweb_PageNotFound
 
-def runner(url, output_helper = None):
+def runner(url, deveopment = False, output_helper = None):
     url = magic_url(url) # Wrap URL string into magic_url class
     # If the call to @GET decorator __call__() is a magic_url then
     # then the request came from here, if not it's a direct call!
@@ -75,10 +68,10 @@ def runner(url, output_helper = None):
         output_html = router(url)
     except Pyerweb_PageNotFound, errormsg:
         output_html = "<html><head><title>ERROR 404</title></head><body>The URL %s could not be found</body></html>" % (url)
-    except Pyerweb_InternalServerError, errormsg:
-        output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (errormsg)
-        
-    
+    except Exception, errormsg: # unhandled error!
+        tb = traceback.format_exc()
+        output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (tb)
+
     if output_helper is not None:
         if output_helper not in dir(OutputHelpers()):
             raise ValueError("Invalid OutputHelper %s used" % (output_helper))
