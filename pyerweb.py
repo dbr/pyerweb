@@ -57,7 +57,7 @@ def router(url):
     else: # We checked all site functions, none matched, raise error 404
         raise Pyerweb_PageNotFound
 
-def runner(url, deveopment = False, output_helper = None):
+def runner(url, development = False, output_helper = None):
     url = magic_url(url) # Wrap URL string into magic_url class
     # If the call to @GET decorator __call__() is a magic_url then
     # then the request came from here, if not it's a direct call!
