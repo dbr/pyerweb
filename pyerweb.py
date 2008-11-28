@@ -20,22 +20,22 @@ class OutputHelpers:
 class magic_url(str):pass
 
 class GET:
-    def __init__(self, orig_url):
-        self.orig_url = orig_url
-        self.matcher = re.compile(orig_url)
+    def __init__(self, *urls):
+        self.matchers = [(orig_url, matcher) for orig_url, matcher in zip(urls, map(re.compile, urls))]
     
     def __call__(self, func):
         def new_fun(*args, **kwargs):
-            if isinstance(args[0], magic_url):
+            if len(args) == 1 and isinstance(args[0], magic_url):
                 # It's a Pyerweb dispatched call
-                check_url = self.matcher.match(args[0]) # request URL is first arg
-                if check_url:
-                    parsed_args = check_url.groups()
-                else:
+                for orig_url, matcher in self.matchers:
+                    check_url = matcher.match(args[0]) # request URL is first arg
+                    if check_url:
+                        parsed_args = check_url.groups()
+                        return func(*parsed_args)
+                else: # The URL did not match any of the supplied URLs
                     raise Pyerweb_UrlMismatch(
-                        "URL %s does not match %s" % (args[0], self.orig_url)
+                        "URL %s does not match %s" % (args[0], orig_url)
                     )
-                return func(*parsed_args)
             else:
                 # It's a direct call to the function
                 return func(*args, **kwargs)
