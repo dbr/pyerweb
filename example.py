@@ -50,10 +50,10 @@ class MySite:
 # A GET request to "/blog/view/hello" will go to view_post.
 # A GET request to "/a/fake/URL" will return an error 404
 
-@GET("^/$")
+@GET("^/$", "/index")
 def index():
     # Display the post archive by running the welcome() page
-    return welcome()
+    return archive()
 
 @GET("^/archive$")
 def archive():
