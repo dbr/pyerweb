@@ -14,7 +14,7 @@ class OutputHelpers:
             stdin = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
-        tidy.stdin.write(html)
+        tidy.stdin.write(html.encode())
         return tidy.communicate()[0]
 
 class magic_url(str):pass
