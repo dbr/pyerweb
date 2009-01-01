@@ -21,7 +21,7 @@ class magic_url(str):pass
 
 class GET:
     def __init__(self, *urls):
-        self.matchers = [(orig_url, matcher) for orig_url, matcher in zip(urls, map(re.compile, urls))]
+        self.matchers = [(orig_url, matcher) for orig_url, matcher in zip(urls, list(map(re.compile, urls)))]
     
     def __call__(self, func):
         def new_fun(*args, **kwargs):
@@ -47,9 +47,9 @@ def router(url):
     for cur in PYERWEB_SITE_FUNCTIONS:
         try:
             output_html = cur(url)
-            if not (isinstance(output_html, unicode) or isinstance(output_html, str)):
+            if not (isinstance(output_html, str) or isinstance(output_html, unicode)):
                 output_html = ""
-        except Pyerweb_UrlMismatch, errormsg:
+        except Pyerweb_UrlMismatch:
             pass # The regex doesn't match, skip it
         
         else:
@@ -64,9 +64,9 @@ def runner(url, development = False, output_helper = None):
     
     try:
         output_html = router(url)
-    except Pyerweb_PageNotFound, errormsg:
+    except Pyerweb_PageNotFound:
         output_html = "<html><head><title>ERROR 404</title></head><body>The URL %s could not be found</body></html>" % (url)
-    except Exception, errormsg: # unhandled error!
+    except Exception: # unhandled error!
         tb = traceback.format_exc()
         output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (tb)
 
@@ -75,4 +75,4 @@ def runner(url, development = False, output_helper = None):
             raise ValueError("Invalid OutputHelper %s used" % (output_helper))
         output_html = getattr(OutputHelpers(), output_helper)(output_html)
     
-    print output_html
+    print(output_html)

@@ -35,7 +35,7 @@ class MySite:
     def list_posts(self):
         ret = ""
         ret += "<ul>\n"
-        for cur_post in self.posts.keys():
+        for cur_post in list(self.posts.keys()):
             ret += "<li>%s</li>\n" % (cur_post)
         ret += "</ul>"
         return ret
@@ -90,5 +90,5 @@ for request_url in ["/",
                     "/admin/post/edit/hello",
                     "/makeanerror404",
                     "/makeanerror500"]:
-    print "*"*15, "Request for", request_url, "*"*15
+    print("*"*15, "Request for", request_url, "*"*15)
     runner(request_url, output_helper = "html_tidy")
