@@ -83,12 +83,26 @@ def admin_post(action, postkey):
 def makeanerror500():
     int('abc')
 
-# Simple dispatcher that uses fixed URLs. Will obviously be replaced by
-# a CGI script, or a simple web-server
-for request_url in ["/",
-                    "/blog/view/hello",
-                    "/admin/post/edit/hello",
-                    "/makeanerror404",
-                    "/makeanerror500"]:
-    print("*"*15, "Request for", request_url, "*"*15)
-    runner(request_url, output_helper = "html_tidy")
+@GET("^/blank$")
+def blankpage():
+    return
+
+def main():
+    # Simple dispatcher that uses fixed URLs. Will obviously be replaced by
+    # a CGI script, or a simple web-server
+    for request_url in ["/",
+                        "/blog/view/hello",
+                        "/admin/post/edit/hello",
+                        "/makeanerror404",
+                        "/makeanerror500"]:
+        print("*"*15, "Request for", request_url, "*"*15)
+        def fake_wsgi_callback(response, headers):
+            pass
+        print runner({
+            'REQUEST_METHOD': 'GET',
+            'PATH_INFO': request_url},
+            fake_wsgi_callback
+        )
+
+if __name__ == '__main__':
+    main()
