@@ -61,7 +61,7 @@ def router(url, method = "GET"):
     else: # We checked all site functions, none matched, raise error 404
         raise Pyerweb_PageNotFound
 
-def runner(environ, wsgi_start_response, url = None, method = None, output_helper = None):
+def runner(environ, wsgi_start_response):
     """WSGI request handler"""
     method = environ['REQUEST_METHOD']
     url = environ['PATH_INFO']
