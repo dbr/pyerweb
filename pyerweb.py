@@ -63,16 +63,13 @@ def router(url, method = "GET"):
 
 def runner(environ, wsgi_start_response, url = None, method = None, output_helper = None):
     """WSGI request handler"""
-    if environ is not None: # It's a WSGI call
-        method = environ['REQUEST_METHOD']
-        url = environ['PATH_INFO']
-    else: # runner("/the/url") call
-        method = "GET" if method is None else method
-        url = magic_url(url) # Wrap URL string into magic_url class
+    method = environ['REQUEST_METHOD']
+    url = environ['PATH_INFO']
+    url = magic_url(url) # Wrap URL string into magic_url class
     # If the call to @GET decorator __call__() is a magic_url then
     # then the request came from here, if not it's a direct call!
     
-    output_headers = [("Content-type", "text/html")] # Default header
+    output_headers = [("Content-type", "text/html")] # Default headers
     try:
         output_html, output_headers = router(url, method = method)
     except Pyerweb_PageNotFound:
@@ -82,15 +79,16 @@ def runner(environ, wsgi_start_response, url = None, method = None, output_helpe
         output_response = '500 Internal Server Error'
         tb = traceback.format_exc()
         output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (tb)
-    print "I GOT OUTPUT!"
-    print output_html
-    print output_headers
-    # if output_helper is not None:
-    #     if output_helper not in dir(OutputHelpers()):
-    #         raise ValueError("Invalid OutputHelper %s used" % (output_helper))
-    #     output_html = getattr(OutputHelpers(), output_helper)(output_html)
+
+    if output_helper is not None:
+        if output_helper not in dir(OutputHelpers()):
+            raise ValueError("Invalid OutputHelper %s used" % (output_helper))
+        output_html = getattr(OutputHelpers(), output_helper)(output_html)
 
     if output_html is None:
         output_response = "204 No Content"
-    wsgi_start_response("200 OK", output_headers)
+    else:
+        output_response = "200 OK"
+
+    wsgi_start_response(output_response, output_headers)
     return output_html
