@@ -5,7 +5,7 @@ class Pyerweb_UrlMismatch(Exception):pass
 class Pyerweb_InternalServerError(Exception):pass
 class Pyerweb_PageNotFound(Exception):pass
 
-PYERWEB_SITE_FUNCTIONS = [] # Stores decorated functions
+PYERWEB_SITE_FUNCTIONS = {} # Stores decorated functions
 
 class OutputHelpers:
     def html_tidy(self, html):
