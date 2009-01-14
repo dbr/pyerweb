@@ -79,14 +79,6 @@ def runner(environ, wsgi_start_response):
         output_response = '500 Internal Server Error'
         tb = traceback.format_exc()
         output_html = "<html><head><title>ERROR 500</title></head><body><p>Internal server error! The following error occured:</p><pre>%s</pre></body></html>" % (tb)
-
-    if output_helper is not None:
-        if output_helper not in dir(OutputHelpers()):
-            raise ValueError("Invalid OutputHelper %s used" % (output_helper))
-        output_html = getattr(OutputHelpers(), output_helper)(output_html)
-
-    if output_html is None:
-        output_response = "204 No Content"
     else:
         output_response = "200 OK"
 
