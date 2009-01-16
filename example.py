@@ -95,9 +95,11 @@ def main():
                         "/admin/post/edit/hello",
                         "/makeanerror404",
                         "/makeanerror500"]:
-        print("*"*15, "Request for", request_url, "*"*15)
+
+        print("%s Request for %s %s" % ("*"*15, request_url, "*"*15))
         def fake_wsgi_callback(response, headers):
-            pass
+            print("\n".join(["%s: %s" % (n, v) for n, v in headers]))
+            print("\n")
         print runner({
             'REQUEST_METHOD': 'GET',
             'PATH_INFO': request_url},
