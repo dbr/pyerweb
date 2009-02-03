@@ -100,11 +100,11 @@ def main():
         def fake_wsgi_callback(response, headers):
             print("\n".join(["%s: %s" % (n, v) for n, v in headers]))
             print("\n")
-        print runner({
+        print(runner({
             'REQUEST_METHOD': 'GET',
             'PATH_INFO': request_url},
             fake_wsgi_callback
-        )
+        ))
 
 if __name__ == '__main__':
     main()
