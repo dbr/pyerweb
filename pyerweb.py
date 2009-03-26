@@ -43,8 +43,9 @@ class GET:
         PYERWEB_SITE_FUNCTIONS.setdefault(self.__class__.__name__, []).append(new_fun) # Add to list of URL-mappable functions
         return new_fun
 
-class PUT(GET):
-    pass
+class PUT(GET): pass
+class DELETE(GET): pass
+class POST(GET): pass
 
 def router(url, method = "GET"):
     if method not in PYERWEB_SITE_FUNCTIONS.keys(): raise Pyerweb_PageNotFound
