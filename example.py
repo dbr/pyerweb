@@ -91,6 +91,7 @@ def main():
     # Simple dispatcher that uses fixed URLs. Will obviously be replaced by
     # a CGI script, or a simple web-server
     for request_url in ["/",
+                        "/blank",
                         "/blog/view/hello",
                         "/admin/post/edit/hello",
                         "/makeanerror404",
