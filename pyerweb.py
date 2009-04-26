@@ -1,5 +1,7 @@
 import re
+import sys
 import traceback
+from StringIO import StringIO
 
 class Pyerweb_UrlMismatch(Exception):pass
 class Pyerweb_InternalServerError(Exception):pass
@@ -50,14 +52,21 @@ class POST(GET): pass
 def router(url, method = "GET"):
     if method not in PYERWEB_SITE_FUNCTIONS.keys(): raise Pyerweb_PageNotFound
     for cur in PYERWEB_SITE_FUNCTIONS[method]:
+        orig_stdout, sys.stdout = sys.stdout, StringIO() # swap sys.stdout with StringIO()
         try:
-            output_html = cur(url)
-            if not (isinstance(output_html, str) or isinstance(output_html, unicode)):
-                output_html = ""
+            function_output = cur(url) # run fuction
         except Pyerweb_UrlMismatch:
+            sys.stdout = orig_stdout # restore sys.stdout
             pass # The regex doesn't match, skip it
-        
         else:
+            sys.stdout.seek(0)
+            output_html = sys.stdout.read()
+            sys.stdout = orig_stdout
+            if len(output_html) == 0:
+                if not (isinstance(function_output, str) or isinstance(function_output, unicode)):
+                    output_html = ""
+                else:
+                    output_html = function_output
             return (output_html, [("Content-type", "text/html")])
     else: # We checked all site functions, none matched, raise error 404
         raise Pyerweb_PageNotFound
