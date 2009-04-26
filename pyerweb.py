@@ -1,7 +1,10 @@
 import re
 import sys
 import traceback
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 class Pyerweb_UrlMismatch(Exception):pass
 class Pyerweb_InternalServerError(Exception):pass
